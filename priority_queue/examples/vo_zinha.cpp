@@ -3,57 +3,39 @@
 #include <vector>
 using namespace std;
 
-string findPassword(const string &password, const vector<vector<char>> &substitutes, int P) {
-    int M = substitutes.size();  // número de caracteres borrados
-    int N = password.size();     // tamanho da senha
-
-    // Calcular o total de combinações possíveis
-    vector<int> sizes(M);
-    int totalCombinations = 1;
-    for (int i = 0; i < M; ++i) {
-        sizes[i] = substitutes[i].size();
-        totalCombinations *= sizes[i];
-    }
-
-    // Ajustar P para índice baseado em zero
-    P--;
-
-    // Calcular os índices de cada substituição
-    vector<int> indices(M);
-    for (int i = 0; i < M; ++i) {
-        indices[i] = P % sizes[i];
-        P /= sizes[i];
-    }
-
-    // Montar a senha final
-    string result = password;
-    for (int i = 0; i < N; ++i) {
-        if (result[i] == '#') {
-            result[i] = substitutes[i][indices[i]];
-        }
-    }
-
-    return result;
-}
-
 int main() {
-    int N, M, K, P;
-    cin >> N >> M >> K;
-    string password;
-    cin >> password;
+    int numero_caracteres_senha, quant_caracteres_faltando, quant_opcoes, possibilidade;
+    cin >> numero_caracteres_senha >> quant_caracteres_faltando >> quant_opcoes;
+    vector<string> opcoes_possiveis(quant_caracteres_faltando);
+    string senha;
+    cin >> senha;
 
-    vector<vector<char>> substitutes(M, vector<char>(K));
-    for (int i = 0; i < M; ++i) {
-        for (int j = 0; j < K; ++j) {
-            cin >> substitutes[i][j];
+    for (int i = 0; i < quant_caracteres_faltando; i++) {
+        cin >> opcoes_possiveis[i];
+    }
+
+    for (string& opcao : opcoes_possiveis) {
+        sort(opcao.begin(), opcao.end());
+    }
+
+    cin >> possibilidade;
+
+    vector<int> opcoes(quant_caracteres_faltando);
+
+    possibilidade--;
+    for (int i = quant_caracteres_faltando - 1; i >= 0; i--) {
+        int resto = possibilidade % quant_opcoes;
+        possibilidade /= quant_opcoes;
+        opcoes[i] = resto;
+    }
+
+    int p = 0;
+    for (char c : senha) {
+        if (c != '#')
+            cout << c;
+        else {
+            cout << opcoes_possiveis[p][opcoes[p++]];
         }
     }
-    cin >> P;
-
-    // Encontrar a senha correta
-    string result = findPassword(password, substitutes, P);
-
-    cout << result << endl;
-
-    return 0;
+    cout << endl;
 }
